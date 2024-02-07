@@ -12,10 +12,13 @@ public class Main {
 //        Command stopCommand = new StopHashBreakerCommand();
 //        startCommand.execute();
 //        stopCommand.execute();
+
         HashBreaker h = HashBreaker.getInstance();
 
         Scanner s = new Scanner(System.in);
-        Node n = new Node();
+
+        Node n = Node.getInstance();
+
         String message;
         while(true){
             message = s.nextLine();

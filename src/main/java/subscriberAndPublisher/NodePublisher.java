@@ -1,5 +1,6 @@
 package subscriberAndPublisher;
 import Nodes.FriendNode;
+import io.libp2p.core.PeerId;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,6 +16,30 @@ public class NodePublisher implements Publisher{
         }
         return intance;
     }
+
+    public boolean peerAlreadyInSubscribed(PeerId peerId){
+        return this.getByPeerId(peerId) != null;
+    }
+
+    public void sendMessageToSingleSubscriber(String message, PeerId peerId){
+        FriendNode friendNode = getByPeerId(peerId);
+        if(friendNode == null){
+            System.out.println("COULD NOT FIND NODE");
+            return;
+        }
+
+        friendNode.sendMessage(message);
+    }
+
+    public FriendNode getByPeerId(PeerId peerId){
+        for(var node: subscribers){
+            if(node.peerId.toBase58().equals(peerId.toBase58())){
+                return node;
+            }
+        }
+        return null;
+    }
+
     @Override
     public void sendMessageToSubscribers(String message) {
         for(var x: this.subscribers){
