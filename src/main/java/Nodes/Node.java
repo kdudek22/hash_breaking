@@ -63,30 +63,12 @@ public class Node {
             this.discoverer.start();
 
 
-//            this.hashToFind = this.getHashFromString("whgasv");
+//            this.hashToFind = StringProvider.getHashFromString("whgasv");
 //            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
         }
-    }
-
-    public String getHashFromString(String input){
-        try{
-            MessageDigest encoder = MessageDigest.getInstance("SHA-1");
-
-            byte[] hashedBytes = encoder.digest(input.getBytes());
-
-            StringBuilder hexStringBuilder = new StringBuilder();
-            for (byte b : hashedBytes) {
-                hexStringBuilder.append(String.format("%02x", b));
-            }
-            return hexStringBuilder.toString();
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
-        return "";
     }
 
     public void callbackFromHashBreaker(String foundString){
@@ -98,7 +80,7 @@ public class Node {
             return;
         }
         if(!foundString.equals("")){
-            System.out.println("FOUND SOLUTION " +foundString + " " + this.getHashFromString(foundString) + " " + this.hashToFind);
+            System.out.println("FOUND SOLUTION " +foundString + " " + StringProvider.getHashFromString(foundString) + " " + this.hashToFind);
             NodePublisher publisher = NodePublisher.getInstance();
             publisher.sendMessageToSubscribers("SOLVED:"+foundString);
             StopHashBreakerCommand command = new StopHashBreakerCommand();

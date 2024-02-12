@@ -39,14 +39,14 @@ public class HashBreaker {
     public void breakHash(){
         System.out.println("=== STARTING HASH BREAKER, SOLVING " + this.startString + " - " + this.endString + " " + this.hashToFind + " ===");
         String currentString = this.startString;
-        String currentStrigHash = this.getHashFromString(currentString);
+        String currentStrigHash = StringProvider.getHashFromString(currentString);
         int currentIndex = 0;
         while(!this.stop && !currentStrigHash.equals(this.hashToFind) && !currentString.equals(this.endString) && currentString.length()<=maxLetterCount){
             if(currentIndex%2 == 11){
                 System.out.println(currentString + " " + currentStrigHash + " " + this.hashToFind);
             }
             currentString = StringProvider.generateNextString(currentString);
-            currentStrigHash = this.getHashFromString(currentString);
+            currentStrigHash = StringProvider.getHashFromString(currentString);
             currentIndex+=1;
         }
         if(currentString.length()>maxLetterCount){
@@ -61,22 +61,5 @@ public class HashBreaker {
         node.callbackFromHashBreaker(currentString);
     }
 
-    public String getHashFromString(String input){
-        try{
-            MessageDigest encoder = MessageDigest.getInstance("SHA-1");
-            byte[] hashedBytes = encoder.digest(input.getBytes());
-
-            StringBuilder hexStringBuilder = new StringBuilder();
-            for (byte b : hashedBytes) {
-                hexStringBuilder.append(String.format("%02x", b));
-            }
-
-            return hexStringBuilder.toString();
-        }
-        catch (Exception e){
-            return "";
-        }
-
-    }
 
 }

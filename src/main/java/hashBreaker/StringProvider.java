@@ -1,5 +1,6 @@
 package hashBreaker;
 
+import java.security.MessageDigest;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -45,5 +46,22 @@ public class StringProvider {
         }
 
         return builder.toString();
+    }
+
+    public static String getHashFromString(String input){
+        try{
+            MessageDigest encoder = MessageDigest.getInstance("SHA-1");
+            byte[] hashedBytes = encoder.digest(input.getBytes());
+
+            StringBuilder hexStringBuilder = new StringBuilder();
+            for (byte b : hashedBytes) {
+                hexStringBuilder.append(String.format("%02x", b));
+            }
+
+            return hexStringBuilder.toString();
+        }
+        catch (Exception e){
+            return "";
+        }
     }
 }
