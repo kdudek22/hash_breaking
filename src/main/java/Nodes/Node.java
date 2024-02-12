@@ -63,8 +63,8 @@ public class Node {
             this.discoverer.start();
 
 
-            this.hashToFind = this.getHashFromString("bbbbbb");
-            this.startHashBreaker();
+//            this.hashToFind = this.getHashFromString("whgasv");
+//            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -90,13 +90,19 @@ public class Node {
     }
 
     public void callbackFromHashBreaker(String foundString){
+        if(foundString.equals("BOUNDARY")){
+            System.out.println("??? REACHED THE BOUNDRY ???");
+            StopHashBreakerCommand command = new StopHashBreakerCommand();
+            command.execute();
+            this.cleanVariables();
+            return;
+        }
         if(!foundString.equals("")){
             System.out.println("FOUND SOLUTION " +foundString + " " + this.getHashFromString(foundString) + " " + this.hashToFind);
             NodePublisher publisher = NodePublisher.getInstance();
             publisher.sendMessageToSubscribers("SOLVED:"+foundString);
             StopHashBreakerCommand command = new StopHashBreakerCommand();
             command.execute();
-
             this.cleanVariables();
         }
         else{

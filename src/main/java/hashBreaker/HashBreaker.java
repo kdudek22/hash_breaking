@@ -6,7 +6,6 @@ import java.security.MessageDigest;
 
 public class HashBreaker {
     public static HashBreaker instance;
-    public boolean isCurrentlyWorking = false;
     public String startString;
     public String endString;
     public String hashToFind;
@@ -42,18 +41,22 @@ public class HashBreaker {
         String currentString = this.startString;
         String currentStrigHash = this.getHashFromString(currentString);
         int currentIndex = 0;
-        while(!this.stop && !currentStrigHash.equals(this.hashToFind) && !currentString.equals(this.endString)){
-            if(currentIndex%100000 == 0){
-//                System.out.println(currentString + " " + currentStrigHash + " " + this.hashToFind);
+        while(!this.stop && !currentStrigHash.equals(this.hashToFind) && !currentString.equals(this.endString) && currentString.length()<=maxLetterCount){
+            if(currentIndex%2 == 11){
+                System.out.println(currentString + " " + currentStrigHash + " " + this.hashToFind);
             }
             currentString = StringProvider.generateNextString(currentString);
             currentStrigHash = this.getHashFromString(currentString);
             currentIndex+=1;
         }
+        if(currentString.length()>maxLetterCount){
+            currentString = "BOUNDARY";
+        }
 
-        if(!this.hashToFind.equals(currentStrigHash)){
+        if(!this.hashToFind.equals(currentStrigHash) && !currentString.equals("BOUNDARY")){
             currentString = "";
         }
+
         Node node = Node.getInstance();
         node.callbackFromHashBreaker(currentString);
     }

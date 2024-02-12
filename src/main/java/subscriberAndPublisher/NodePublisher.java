@@ -42,8 +42,8 @@ public class NodePublisher implements Publisher{
 
     @Override
     public void sendMessageToSubscribers(String message) {
-        for(var x: this.subscribers){
-            x.sendMessage(message);
+        for(var subscriber: this.subscribers){
+            subscriber.sendMessage(message);
         }
     }
 
