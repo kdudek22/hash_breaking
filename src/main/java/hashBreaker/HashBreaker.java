@@ -38,13 +38,13 @@ public class HashBreaker {
     }
 
     public void breakHash(){
-        System.out.println("STARTING HASH BREAKER, SOLVING " + this.startString + " - " + this.endString + " " + this.hashToFind);
+        System.out.println("=== STARTING HASH BREAKER, SOLVING " + this.startString + " - " + this.endString + " " + this.hashToFind + " ===");
         String currentString = this.startString;
         String currentStrigHash = this.getHashFromString(currentString);
         int currentIndex = 0;
         while(!this.stop && !currentStrigHash.equals(this.hashToFind) && !currentString.equals(this.endString)){
             if(currentIndex%100000 == 0){
-                System.out.println(currentString + " " + currentStrigHash + " " + this.hashToFind);
+//                System.out.println(currentString + " " + currentStrigHash + " " + this.hashToFind);
             }
             currentString = StringProvider.generateNextString(currentString);
             currentStrigHash = this.getHashFromString(currentString);

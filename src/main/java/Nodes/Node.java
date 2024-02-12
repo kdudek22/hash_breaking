@@ -26,7 +26,7 @@ public class Node {
     public String addressString;
     public Discoverer discoverer;
     public List<PeerId> knownNodes = new ArrayList<>();
-    public int solveBatchAmount = 1000000;
+    public int solveBatchAmount = 3000000;
     public List<StringInterval> alreadyDone = new ArrayList<>();
     public List<String> currentWork = new ArrayList<>();
     public String hashToFind;
@@ -63,7 +63,7 @@ public class Node {
             this.discoverer.start();
 
 
-            this.hashToFind = this.getHashFromString("aaaaaa");
+            this.hashToFind = this.getHashFromString("bbbbbb");
             this.startHashBreaker();
         }
         catch (Exception e){
@@ -100,21 +100,22 @@ public class Node {
             this.cleanVariables();
         }
         else{
-            System.out.println("DISH DISH DISH");
-            this.alreadyDone.add(new StringInterval(this.currentStartString,this.currentEndString));
-            Collections.sort(this.alreadyDone);
-            this.startNextInterval = true;
+            StringInterval searchedInterval = new StringInterval(this.currentStartString,this.currentEndString);
+            System.out.println("*** SEARCHED INTERVAL " + searchedInterval + " ***");
+            if(this.currentStartString!=null){
+                this.alreadyDone.add(searchedInterval);
+                Collections.sort(this.alreadyDone);
+                this.startNextInterval = true;
+            }
         }
     }
 
     public void startHashBreaker(){
         this.finished = false;
         new Thread(()->{
-            while(!this.finished){
+            while(!this.finished && this.hashToFind!=null){
                 try{
-                    System.out.println("XXXX");
-                    Thread.sleep(500);
-                    if(this.startNextInterval){
+                    if(this.startNextInterval && !this.finished && this.hashToFind!=null){
 
                         this.reserveStringInterval();
                         this.conflict = false;
@@ -129,12 +130,14 @@ public class Node {
                             this.reserveStringInterval();
                             Thread.sleep(2000);
                         }
+                        if(!this.finished && this.hashToFind!=null){
+                            this.startNextInterval = false;
+                            this.currentStartString = this.calcluateStartString();
+                            this.currentEndString = this.calculateEndString(this.currentStartString);
+                            SolveHashIntervalCommand command = new SolveHashIntervalCommand(this.currentStartString,this.currentEndString,this.hashToFind);
+                            command.execute();
+                        }
 
-                        this.startNextInterval = false;
-                        this.currentStartString = this.calcluateStartString();
-                        this.currentEndString = this.calculateEndString(this.currentStartString);
-                        SolveHashIntervalCommand command = new SolveHashIntervalCommand(this.currentStartString,this.currentEndString,this.hashToFind);
-                        command.execute();
                     }
                     else{
                         Thread.sleep(3000);
@@ -145,6 +148,7 @@ public class Node {
                 }
 
             }
+            System.out.println("FINISHED");
         }).start();
     }
 
@@ -164,7 +168,7 @@ public class Node {
         }
         System.out.println(this.alreadyDone);
         for(int i=0;i<this.alreadyDone.size()-1;i++){
-            if(!StringProvider.generateNextString(this.alreadyDone.get(i).endString).equals(this.alreadyDone.get(i+1).startString)){
+            if(!StringProvider.generateNextString(this.alreadyDone.get(i).endString).equals(this.alreadyDone.get(i+1).startString) && !this.alreadyDone.get(i).equals(this.alreadyDone.get(i+1))){
                 return StringProvider.generateNextString(this.alreadyDone.get(i).endString);
             }
         }
@@ -288,6 +292,9 @@ public class Node {
 
 
             StringInterval stringInterval = new StringInterval(firstString, secondString);
+            if(firstString.equals("null")){
+                var x = 123;
+            }
             this.jobs.get(id).add(stringInterval);
             this.alreadyDone.add(stringInterval);
             Collections.sort(this.alreadyDone);
@@ -312,6 +319,13 @@ public class Node {
         this.recentReserves = new HashMap<>();
         this.jobs = new HashMap<>();
         this.hashToFind = null;
+        this.startNextInterval = true;
+        this.currentStartString = null;
+        this.currentEndString = null;
+        this.conflict = false;
+        this.possibleInterval = null;
+        this.alreadyDone = new ArrayList<>();
+        this.currentWork = new ArrayList<>();
         System.out.println("CLEANED NODE");
     }
 

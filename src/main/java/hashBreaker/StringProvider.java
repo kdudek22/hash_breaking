@@ -15,6 +15,9 @@ public class StringProvider {
     }
 
     public static long convertStringToNumber(String s){
+        if(s==null){
+            var x =123;
+        }
         char[] arr = s.toCharArray();
         long indexMultiply = 1;
         long res = 0;
