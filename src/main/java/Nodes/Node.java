@@ -1,8 +1,5 @@
 package Nodes;
-import command.ReserveCommand;
-import command.SolveCommand;
-import command.SolveHashIntervalCommand;
-import command.StopHashBreakerCommand;
+import command.*;
 import hashBreaker.StringProvider;
 import io.libp2p.core.*;
 import io.libp2p.core.dsl.HostBuilder;
@@ -20,12 +17,10 @@ import java.util.*;
 public class Node {
 
     public static Node instance;
-    public static boolean isStarting;
     public Host host;
     public InetAddress address;
     public String addressString;
     public Discoverer discoverer;
-    public List<PeerId> knownNodes = new ArrayList<>();
     public int solveBatchAmount = 3000000;
     public List<StringInterval> alreadyDone = new ArrayList<>();
     public List<String> currentWork = new ArrayList<>();
@@ -63,7 +58,7 @@ public class Node {
             this.discoverer.start();
 
 
-//            this.hashToFind = StringProvider.getHashFromString("whgasv");
+//            this.hashToFind = StringProvider.getHashFromString("zzzzz");
 //            this.startHashBreaker();
         }
         catch (Exception e){
@@ -74,18 +69,16 @@ public class Node {
     public void callbackFromHashBreaker(String foundString){
         if(foundString.equals("BOUNDARY")){
             System.out.println("??? REACHED THE BOUNDRY ???");
-            StopHashBreakerCommand command = new StopHashBreakerCommand();
+            StopAndCleanCommand command = new StopAndCleanCommand();
             command.execute();
-            this.cleanVariables();
             return;
         }
         if(!foundString.equals("")){
             System.out.println("FOUND SOLUTION " +foundString + " " + StringProvider.getHashFromString(foundString) + " " + this.hashToFind);
             NodePublisher publisher = NodePublisher.getInstance();
             publisher.sendMessageToSubscribers("SOLVED:"+foundString);
-            StopHashBreakerCommand command = new StopHashBreakerCommand();
+            StopAndCleanCommand command = new StopAndCleanCommand();
             command.execute();
-            this.cleanVariables();
         }
         else{
             StringInterval searchedInterval = new StringInterval(this.currentStartString,this.currentEndString);
@@ -250,20 +243,13 @@ public class Node {
         System.out.println("MESSAGE FROM " + id.toBase58() + ": " + message);
 
         if(message.startsWith("SOLVED")){
-            StopHashBreakerCommand command = new StopHashBreakerCommand();
+            StopAndCleanCommand command = new StopAndCleanCommand();
             command.execute();
-            this.cleanVariables();
         }
 
         if(message.startsWith("SOLVE")){
             SolveCommand solveCommand = new SolveCommand(message);
             solveCommand.execute();
-            synchronized (this){
-                if(this.finished){
-                    this.finished = false;
-                    this.startHashBreaker();
-                }
-            }
         }
         if(message.startsWith("RESERVE")){
             String both = message.split("-")[1];
