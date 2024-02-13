@@ -3,7 +3,7 @@ package command;
 import Nodes.Node;
 import Nodes.StringInterval;
 
-public class ReserveCommand implements Command{
+public class BroadcastReserveCommand implements Command{
 
     @Override
     public void execute() {

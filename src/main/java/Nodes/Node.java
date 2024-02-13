@@ -31,9 +31,9 @@ public class Node {
     public boolean conflict;
     public StringInterval possibleInterval;
 
-    Map<PeerId, StringInterval> recentReserves = new HashMap<>();
+    public Map<PeerId, StringInterval> recentReserves = new HashMap<>();
 
-    Map<PeerId, List<StringInterval>> jobs = new HashMap<>();
+    public Map<PeerId, List<StringInterval>> jobs = new HashMap<>();
 
     public static Node getInstance(){
         if(instance == null){
@@ -56,8 +56,8 @@ public class Node {
             });
             this.discoverer.start();
 
-            this.hashToFind = StringProvider.getHashFromString("zzzzz");
-            this.startHashBreaker();
+//            this.hashToFind = StringProvider.getHashFromString("dddddd");
+//            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -93,24 +93,13 @@ public class Node {
                 try{
                     if(this.startNextInterval && !this.finished && this.hashToFind!=null){
 
-                        this.reserveStringInterval();
-                        this.conflict = false;
+                        this.checkIfConflictsAndResolve();
 
-                        for(var x : this.recentReserves.keySet()){
-                            this.checkIfReserveDoesNotCollide(this.recentReserves.get(x),x);
-                        }
-                        Thread.sleep(2000);
-
-                        while(this.conflict){
-                            this.conflict = false;
-                            this.reserveStringInterval();
-                            Thread.sleep(2000);
-                        }
+                        System.out.println(this.alreadyDone);
                         if(!this.finished && this.hashToFind!=null){
                             SolveHashIntervalCommand command = new SolveHashIntervalCommand(this.hashToFind);
                             command.execute();
                         }
-
                     }
                     else{
                         Thread.sleep(3000);
@@ -124,9 +113,27 @@ public class Node {
             System.out.println("FINISHED");
         }).start();
     }
+    public void checkIfConflictsAndResolve(){
+        Boolean firstTime = true;
+        while(this.conflict || firstTime){
+            this.conflict = false;
+            this.reserveStringInterval();
+
+            for(var x : this.recentReserves.keySet()){
+                this.checkIfReserveDoesNotCollide(this.recentReserves.get(x),x);
+            }
+            try{
+            Thread.sleep(500);
+            }
+            catch (Exception e){
+                System.out.println("INTERRUPTED");
+            }
+            firstTime = false;
+        }
+    }
 
     public void reserveStringInterval(){
-        ReserveCommand reserveCommand = new ReserveCommand();
+        BroadcastReserveCommand reserveCommand = new BroadcastReserveCommand();
         reserveCommand.execute();
     }
 
@@ -146,22 +153,12 @@ public class Node {
         return StringProvider.convertNumberToString(this.solveBatchAmount+StringProvider.convertStringToNumber(startString));
     }
 
-    public Pair<Stream, ChatController> connectChat(PeerInfo info) {
-        try {
-            var chat = new Chat(this::messageReceived).dial(this.host,info.getPeerId(), info.getAddresses().get(0));
-            return new Pair(chat.getStream().get(),chat.getController().get());
-        }
-        catch (Exception e){
-            return null;
-        }
-    }
 
     public void checkIfReserveDoesNotCollide(StringInterval stringInterval, PeerId peerId){
         if(this.possibleInterval.equals(stringInterval)){
             if(this.host.getPeerId().toBase58().compareTo(peerId.toBase58())<0){
                 NodePublisher nodePublisher = NodePublisher.getInstance();
                 nodePublisher.sendMessageToSingleSubscriber("CONFLICT", peerId);
-
             }
             else{
                 this.conflict  = true;
@@ -179,18 +176,11 @@ public class Node {
         nodePublisher.sendMessageToSubscribers("RESERVE-"+startString+":"+endString);
     }
 
-    public void send(String message) {
-        NodePublisher p = NodePublisher.getInstance();
-        p.sendMessageToSubscribers(message);
-    }
-
     public void peerFound(PeerInfo info) {
         NodePublisher publisher = NodePublisher.getInstance();
-
         if (info.getPeerId().equals(this.host.getPeerId()) || publisher.peerAlreadyInSubscribed(info.getPeerId())) {
             return;
         }
-
 
         var chatConnection = connectChat(info);
         FriendNode friendNode = new FriendNode(info.getPeerId(), new Friend(info.getPeerId().toBase58(),chatConnection.getSecond()));
@@ -223,6 +213,8 @@ public class Node {
     public void handleDisconnect(FriendNode friendNode){
         NodePublisher publisher = NodePublisher.getInstance();
         publisher.removeSubscriber(friendNode);
+
+
     }
 
     public String messageReceived(PeerId id, String message){
@@ -233,28 +225,19 @@ public class Node {
             command.execute();
         }
 
-        if(message.startsWith("SOLVE")){
+        else if(message.startsWith("SOLVE")){
             SolveCommand solveCommand = new SolveCommand(message);
             solveCommand.execute();
         }
-        if(message.startsWith("RESERVE")){
-            String both = message.split("-")[1];
-            String firstString = both.split(":")[0];
-            String secondString = both.split(":")[1];
-            StringInterval recievedInterval = new StringInterval(firstString,secondString);
-            this.recentReserves.put(id, recievedInterval);
-            this.checkIfReserveDoesNotCollide(recievedInterval, id);
+
+        else if(message.startsWith("RESERVE")){
+            IncomingReserveCommand command = new IncomingReserveCommand(message, id);
+            command.execute();
         }
-        if(message.startsWith("SOLVING")){
-            String both = message.split("-")[1];
-            String firstString = both.split(":")[0];
-            String secondString = both.split(":")[1];
 
-
-            StringInterval stringInterval = new StringInterval(firstString, secondString);
-            this.jobs.get(id).add(stringInterval);
-            this.alreadyDone.add(stringInterval);
-            Collections.sort(this.alreadyDone);
+        else if(message.startsWith("SOLVING")){
+            IncomingSolvingCommand command = new IncomingSolvingCommand(message, id);
+            command.execute();
         }
 
         return "";
@@ -271,6 +254,17 @@ public class Node {
             return null;
         }
     }
+
+    public Pair<Stream, ChatController> connectChat(PeerInfo info) {
+        try {
+            var chat = new Chat(this::messageReceived).dial(this.host,info.getPeerId(), info.getAddresses().get(0));
+            return new Pair(chat.getStream().get(),chat.getController().get());
+        }
+        catch (Exception e){
+            return null;
+        }
+    }
+
     public void cleanVariables(){
         this.finished = true;
         this.recentReserves = new HashMap<>();
