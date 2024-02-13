@@ -11,7 +11,6 @@ import subscriberAndPublisher.NodePublisher;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.security.MessageDigest;
 import java.util.*;
 
 public class Node {
@@ -57,9 +56,8 @@ public class Node {
             });
             this.discoverer.start();
 
-
-//            this.hashToFind = StringProvider.getHashFromString("zzzzz");
-//            this.startHashBreaker();
+            this.hashToFind = StringProvider.getHashFromString("zzzzz");
+            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -71,13 +69,10 @@ public class Node {
             System.out.println("??? REACHED THE BOUNDRY ???");
             StopAndCleanCommand command = new StopAndCleanCommand();
             command.execute();
-            return;
         }
-        if(!foundString.equals("")){
+        else if(!foundString.equals("")){
             System.out.println("FOUND SOLUTION " +foundString + " " + StringProvider.getHashFromString(foundString) + " " + this.hashToFind);
-            NodePublisher publisher = NodePublisher.getInstance();
-            publisher.sendMessageToSubscribers("SOLVED:"+foundString);
-            StopAndCleanCommand command = new StopAndCleanCommand();
+            FoundSolutionCommand command = new FoundSolutionCommand(foundString);
             command.execute();
         }
         else{
@@ -112,10 +107,7 @@ public class Node {
                             Thread.sleep(2000);
                         }
                         if(!this.finished && this.hashToFind!=null){
-                            this.startNextInterval = false;
-                            this.currentStartString = this.calcluateStartString();
-                            this.currentEndString = this.calculateEndString(this.currentStartString);
-                            SolveHashIntervalCommand command = new SolveHashIntervalCommand(this.currentStartString,this.currentEndString,this.hashToFind);
+                            SolveHashIntervalCommand command = new SolveHashIntervalCommand(this.hashToFind);
                             command.execute();
                         }
 
@@ -153,7 +145,7 @@ public class Node {
                 return StringProvider.generateNextString(this.alreadyDone.get(i).endString);
             }
         }
-        String lastString = this.alreadyDone.getLast().endString;
+        String lastString = this.alreadyDone.get(this.alreadyDone.size()-1).endString;
         return StringProvider.generateNextString(lastString);
     }
     public String calculateEndString(String startString){
@@ -225,12 +217,12 @@ public class Node {
             if(!this.finished){
                 StringInterval interval = new StringInterval("a","a");
                 for(var x: this.alreadyDone){
-                    if(this.jobs.get(info.getPeerId()).getLast().equals(x)){
+                    if(this.jobs.get(info.getPeerId()).get(this.jobs.size()-1).equals(x)){
                         interval = x;
                     }
                 }
                 this.alreadyDone.remove(interval);
-                System.out.println("THEIR LAST JOB WAS " + this.jobs.get(info.getPeerId()).getLast());
+                System.out.println("THEIR LAST JOB WAS " + this.jobs.get(info.getPeerId()).get(this.jobs.size()-1));
             }
         });
     }

@@ -4,21 +4,21 @@ import Nodes.Node;
 import hashBreaker.HashBreaker;
 
 public class SolveHashIntervalCommand implements Command{
-    String startString;
-    String endString;
     String hastToFind;
 
-    public SolveHashIntervalCommand(String startString, String endString, String hashToFind){
-        this.startString = startString;
-        this.endString = endString;
+    public SolveHashIntervalCommand(String hashToFind){
         this.hastToFind = hashToFind;
     }
 
     @Override
     public void execute() {
         Node n = Node.getInstance();
+        n.startNextInterval = false;
+        n.currentStartString = n.calcluateStartString();
+        n.currentEndString = n.calculateEndString(n.currentStartString);
+
         n.broadcastInterval();
         HashBreaker h = HashBreaker.getInstance();
-        h.startBreaker(this.startString, this.endString, this.hastToFind);
+        h.startBreaker(n.currentStartString, n.currentEndString, this.hastToFind);
     }
 }
