@@ -29,7 +29,7 @@ public class Node {
     public String currentStartString;
     public String currentEndString;
     public boolean conflict;
-    StringInterval possibleInterval;
+    public StringInterval possibleInterval;
 
     Map<PeerId, StringInterval> recentReserves = new HashMap<>();
 
@@ -126,12 +126,7 @@ public class Node {
     }
 
     public void reserveStringInterval(){
-        String possibleStartString = this.calcluateStartString();
-        StringInterval possibleInterval = new StringInterval(possibleStartString, this.calculateEndString(possibleStartString));
-        ReserveCommand reserveCommand = new ReserveCommand(possibleInterval.startString, possibleInterval.endString);
-        this.possibleInterval = possibleInterval;
-        this.conflict=false;
-        System.out.println("RESERVING " + this.possibleInterval);
+        ReserveCommand reserveCommand = new ReserveCommand();
         reserveCommand.execute();
     }
 
@@ -139,7 +134,6 @@ public class Node {
         if(this.alreadyDone.isEmpty()){
             return "a";
         }
-        System.out.println(this.alreadyDone);
         for(int i=0;i<this.alreadyDone.size()-1;i++){
             if(!StringProvider.generateNextString(this.alreadyDone.get(i).endString).equals(this.alreadyDone.get(i+1).startString) && !this.alreadyDone.get(i).equals(this.alreadyDone.get(i+1))){
                 return StringProvider.generateNextString(this.alreadyDone.get(i).endString);
@@ -258,9 +252,6 @@ public class Node {
 
 
             StringInterval stringInterval = new StringInterval(firstString, secondString);
-            if(firstString.equals("null")){
-                var x = 123;
-            }
             this.jobs.get(id).add(stringInterval);
             this.alreadyDone.add(stringInterval);
             Collections.sort(this.alreadyDone);

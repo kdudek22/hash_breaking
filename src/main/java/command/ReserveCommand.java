@@ -1,17 +1,21 @@
 package command;
 
 import Nodes.Node;
+import Nodes.StringInterval;
 
 public class ReserveCommand implements Command{
-    public String startString;
-    public String endString;
-    public ReserveCommand(String startString, String endString){
-        this.startString = startString;
-        this.endString = endString;
-    }
+
     @Override
     public void execute() {
         Node node = Node.getInstance();
-        node.broadcastPossibleInterval(startString, endString);
+
+        String possibleStartString = node.calcluateStartString();
+        StringInterval possibleInterval = new StringInterval(possibleStartString, node.calculateEndString(possibleStartString));
+
+        node.possibleInterval = possibleInterval;
+        node.conflict=false;
+        System.out.println("RESERVING " + node.possibleInterval);
+
+        node.broadcastPossibleInterval(node.possibleInterval.startString, node.possibleInterval.endString);
     }
 }
