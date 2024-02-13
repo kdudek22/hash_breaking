@@ -9,6 +9,7 @@ public class IncomingReserveCommand implements Command{
     public PeerId id;
     public IncomingReserveCommand(String message, PeerId id){
         this.message = message;
+        this.id = id;
     }
     @Override
     public void execute() {

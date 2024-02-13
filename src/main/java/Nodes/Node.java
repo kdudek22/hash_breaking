@@ -56,8 +56,8 @@ public class Node {
             });
             this.discoverer.start();
 
-//            this.hashToFind = StringProvider.getHashFromString("dddddd");
-//            this.startHashBreaker();
+            this.hashToFind = StringProvider.getHashFromString("dddddd");
+            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -118,12 +118,11 @@ public class Node {
         while(this.conflict || firstTime){
             this.conflict = false;
             this.reserveStringInterval();
-
             for(var x : this.recentReserves.keySet()){
                 this.checkIfReserveDoesNotCollide(this.recentReserves.get(x),x);
             }
             try{
-            Thread.sleep(500);
+            Thread.sleep(1500);
             }
             catch (Exception e){
                 System.out.println("INTERRUPTED");
@@ -213,8 +212,6 @@ public class Node {
     public void handleDisconnect(FriendNode friendNode){
         NodePublisher publisher = NodePublisher.getInstance();
         publisher.removeSubscriber(friendNode);
-
-
     }
 
     public String messageReceived(PeerId id, String message){
