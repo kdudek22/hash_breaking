@@ -1,7 +1,7 @@
 package command;
 
 import Nodes.Node;
-import Nodes.StringInterval;
+import hashBreaker.StringInterval;
 
 public class BroadcastReserveCommand implements Command{
 

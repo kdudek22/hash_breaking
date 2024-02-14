@@ -1,5 +1,6 @@
 package Nodes;
 import command.*;
+import hashBreaker.StringInterval;
 import hashBreaker.StringProvider;
 import io.libp2p.core.*;
 import io.libp2p.core.dsl.HostBuilder;
@@ -56,8 +57,8 @@ public class Node {
             });
             this.discoverer.start();
 
-            this.hashToFind = StringProvider.getHashFromString("dddddd");
-            this.startHashBreaker();
+//            this.hashToFind = StringProvider.getHashFromString("dddddd");
+//            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -137,7 +138,7 @@ public class Node {
     }
 
     public String calcluateStartString(){
-        if(this.alreadyDone.isEmpty()){
+        if(this.alreadyDone.isEmpty() || !this.alreadyDone.get(0).startString.equals("a")){
             return "a";
         }
         for(int i=0;i<this.alreadyDone.size()-1;i++){
@@ -151,7 +152,6 @@ public class Node {
     public String calculateEndString(String startString){
         return StringProvider.convertNumberToString(this.solveBatchAmount+StringProvider.convertStringToNumber(startString));
     }
-
 
     public void checkIfReserveDoesNotCollide(StringInterval stringInterval, PeerId peerId){
         if(this.possibleInterval.equals(stringInterval)){
@@ -177,7 +177,7 @@ public class Node {
 
     public void peerFound(PeerInfo info) {
         NodePublisher publisher = NodePublisher.getInstance();
-        if (info.getPeerId().equals(this.host.getPeerId()) || publisher.peerAlreadyInSubscribed(info.getPeerId())) {
+        if (this.peerIsAlreadyAdded(info)) {
             return;
         }
 
@@ -197,21 +197,31 @@ public class Node {
 
         chatConnection.getFirst().closeFuture().thenAccept((e)->{
             handleDisconnect(friendNode);
-            if(!this.finished){
+
+        });
+    }
+
+    public boolean peerIsAlreadyAdded(PeerInfo info){
+        NodePublisher publisher = NodePublisher.getInstance();
+        return info.getPeerId().equals(this.host.getPeerId()) || publisher.peerAlreadyInSubscribed(info.getPeerId());
+    }
+
+    public void handleDisconnect(FriendNode friendNode){
+        NodePublisher publisher = NodePublisher.getInstance();
+        publisher.removeSubscriber(friendNode);
+
+        if(!this.finished){
+            if(this.jobs.containsKey(friendNode.peerId)){
                 StringInterval interval = new StringInterval("a","a");
                 for(var x: this.alreadyDone){
-                    if(this.jobs.get(info.getPeerId()).get(this.jobs.size()-1).equals(x)){
+                    if(this.jobs.get(friendNode.peerId).get(this.jobs.size()-1).equals(x)){
                         interval = x;
                     }
                 }
                 this.alreadyDone.remove(interval);
-                System.out.println("THEIR LAST JOB WAS " + this.jobs.get(info.getPeerId()).get(this.jobs.size()-1));
+                System.out.println("THEIR LAST JOB WAS " + this.jobs.get(friendNode.peerId).get(this.jobs.size()-1));
             }
-        });
-    }
-    public void handleDisconnect(FriendNode friendNode){
-        NodePublisher publisher = NodePublisher.getInstance();
-        publisher.removeSubscriber(friendNode);
+        }
     }
 
     public String messageReceived(PeerId id, String message){

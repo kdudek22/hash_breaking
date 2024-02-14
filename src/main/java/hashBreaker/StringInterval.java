@@ -1,6 +1,5 @@
-package Nodes;
+package hashBreaker;
 
-import hashBreaker.StringProvider;
 import org.jetbrains.annotations.NotNull;
 
 public class StringInterval implements Comparable{

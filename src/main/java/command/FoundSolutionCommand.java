@@ -10,7 +10,7 @@ public class FoundSolutionCommand implements Command{
     @Override
     public void execute() {
         NodePublisher publisher = NodePublisher.getInstance();
-        publisher.sendMessageToSubscribers("SOLVED:"+this.resString);
+        publisher.sendMessageToSubscribers("SOLVED:"+this.resString     );
         StopAndCleanCommand command = new StopAndCleanCommand();
         command.execute();
     }

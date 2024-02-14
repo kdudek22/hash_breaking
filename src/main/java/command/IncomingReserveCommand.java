@@ -1,7 +1,7 @@
 package command;
 
 import Nodes.Node;
-import Nodes.StringInterval;
+import hashBreaker.StringInterval;
 import io.libp2p.core.PeerId;
 
 public class IncomingReserveCommand implements Command{

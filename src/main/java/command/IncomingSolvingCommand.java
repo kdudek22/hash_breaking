@@ -1,9 +1,8 @@
 package command;
 
 import Nodes.Node;
-import Nodes.StringInterval;
+import hashBreaker.StringInterval;
 import io.libp2p.core.PeerId;
-import relay.pb.Relay;
 
 import java.util.Collections;
 
@@ -22,8 +21,11 @@ public class IncomingSolvingCommand implements Command{
         String secondString = both.split(":")[1];
 
 
+
         StringInterval stringInterval = new StringInterval(firstString, secondString);
+        System.out.println(node.jobs);
         node.jobs.get(id).add(stringInterval);
+        System.out.println(node.jobs);
         node.alreadyDone.add(stringInterval);
         Collections.sort(node.alreadyDone);
     }
