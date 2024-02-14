@@ -8,6 +8,7 @@ import io.libp2p.discovery.MDnsDiscovery;
 import io.libp2p.example.chat.Chat;
 import io.libp2p.example.chat.ChatController;
 import kotlin.Pair;
+import protocol.FriendNodeChatController;
 import subscriberAndPublisher.NodePublisher;
 
 import java.net.DatagramSocket;
@@ -182,7 +183,7 @@ public class Node {
         }
 
         var chatConnection = connectChat(info);
-        FriendNode friendNode = new FriendNode(info.getPeerId(), new Friend(info.getPeerId().toBase58(),chatConnection.getSecond()));
+        FriendNode friendNode = new FriendNode(info.getPeerId(), new FriendNodeChatController(info.getPeerId().toBase58(),chatConnection.getSecond()));
         publisher.addSubscriber(friendNode);
         if(!this.jobs.containsKey(info.getPeerId())){
             this.jobs.put(info.getPeerId(), new ArrayList<>());

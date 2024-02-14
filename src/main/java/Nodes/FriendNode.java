@@ -1,12 +1,13 @@
 package Nodes;
 
 import io.libp2p.core.PeerId;
+import protocol.FriendNodeChatController;
 
 public class FriendNode {
     public PeerId peerId;
-    public Friend friend;
+    public FriendNodeChatController friend;
 
-    public FriendNode(PeerId peerId, Friend friend){
+    public FriendNode(PeerId peerId, FriendNodeChatController friend){
         this.peerId = peerId;
         this.friend = friend;
     }
