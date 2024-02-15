@@ -9,6 +9,7 @@ import io.libp2p.example.chat.Chat;
 import io.libp2p.example.chat.ChatController;
 import kotlin.Pair;
 import protocol.FriendNodeChatController;
+import subscriberAndPublisher.FriendNode;
 import subscriberAndPublisher.NodePublisher;
 
 import java.net.DatagramSocket;
@@ -22,7 +23,7 @@ public class Node {
     public InetAddress address;
     public String addressString;
     public Discoverer discoverer;
-    public int solveBatchAmount = 3000000;
+    public int solveBatchAmount = 10000000;
     public List<StringInterval> alreadyDone = new ArrayList<>();
     public List<String> currentWork = new ArrayList<>();
     public String hashToFind;
@@ -58,8 +59,8 @@ public class Node {
             });
             this.discoverer.start();
 
-//            this.hashToFind = StringProvider.getHashFromString("dddddd");
-//            this.startHashBreaker();
+            this.hashToFind = StringProvider.getHashFromString("zzzzz");
+            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -212,16 +213,20 @@ public class Node {
         publisher.removeSubscriber(friendNode);
 
         if(!this.finished){
-            if(this.jobs.containsKey(friendNode.peerId)){
-                StringInterval interval = new StringInterval("a","a");
-                for(var x: this.alreadyDone){
-                    if(this.jobs.get(friendNode.peerId).get(this.jobs.size()-1).equals(x)){
-                        interval = x;
-                    }
+            this.handleDisconnectedNodeLastJob(friendNode);
+
+        }
+    }
+    public void handleDisconnectedNodeLastJob(FriendNode friendNode){
+        if(this.jobs.containsKey(friendNode.peerId)){
+            StringInterval interval = new StringInterval("a","a");
+            for(var x: this.alreadyDone){
+                if(this.jobs.get(friendNode.peerId).get(this.jobs.size()-1).equals(x)){
+                    interval = x;
                 }
-                this.alreadyDone.remove(interval);
-                System.out.println("THEIR LAST JOB WAS " + this.jobs.get(friendNode.peerId).get(this.jobs.size()-1));
             }
+            this.alreadyDone.remove(interval);
+            System.out.println("THEIR LAST JOB WAS " + this.jobs.get(friendNode.peerId).get(this.jobs.size()-1));
         }
     }
 

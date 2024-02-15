@@ -1,5 +1,4 @@
 package subscriberAndPublisher;
-import Nodes.FriendNode;
 import io.libp2p.core.PeerId;
 
 import java.util.ArrayList;

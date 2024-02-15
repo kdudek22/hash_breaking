@@ -1,9 +1,9 @@
-package Nodes;
+package subscriberAndPublisher;
 
 import io.libp2p.core.PeerId;
 import protocol.FriendNodeChatController;
 
-public class FriendNode {
+public class FriendNode implements Subscriber{
     public PeerId peerId;
     public FriendNodeChatController friend;
 
@@ -12,6 +12,7 @@ public class FriendNode {
         this.friend = friend;
     }
 
+    @Override
     public void sendMessage(String message){
         this.friend.chatController.send(message);
     }
