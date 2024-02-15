@@ -25,7 +25,6 @@ public class Node {
     public Discoverer discoverer;
     public int solveBatchAmount = 10000000;
     public List<StringInterval> alreadyDone = new ArrayList<>();
-    public List<String> currentWork = new ArrayList<>();
     public String hashToFind;
     public Boolean startNextInterval = true;
     public Boolean finished = true;
@@ -116,8 +115,9 @@ public class Node {
             System.out.println("FINISHED");
         }).start();
     }
+
     public void checkIfConflictsAndResolve(){
-        Boolean firstTime = true;
+        boolean firstTime = true;
         while(this.conflict || firstTime){
             this.conflict = false;
             this.reserveStringInterval();
@@ -151,6 +151,7 @@ public class Node {
         String lastString = this.alreadyDone.get(this.alreadyDone.size()-1).endString;
         return StringProvider.generateNextString(lastString);
     }
+
     public String calculateEndString(String startString){
         return StringProvider.convertNumberToString(this.solveBatchAmount+StringProvider.convertStringToNumber(startString));
     }
@@ -186,6 +187,7 @@ public class Node {
         var chatConnection = connectChat(info);
         FriendNode friendNode = new FriendNode(info.getPeerId(), new FriendNodeChatController(info.getPeerId().toBase58(),chatConnection.getSecond()));
         publisher.addSubscriber(friendNode);
+
         if(!this.jobs.containsKey(info.getPeerId())){
             this.jobs.put(info.getPeerId(), new ArrayList<>());
         }
@@ -289,7 +291,6 @@ public class Node {
         this.conflict = false;
         this.possibleInterval = null;
         this.alreadyDone = new ArrayList<>();
-        this.currentWork = new ArrayList<>();
         System.out.println("CLEANED NODE");
     }
 
