@@ -1,4 +1,5 @@
 package subscriberAndPublisher;
+import Nodes.Node;
 import io.libp2p.core.PeerId;
 
 import java.util.ArrayList;
@@ -23,7 +24,9 @@ public class NodePublisher implements Publisher{
     public void sendMessageToSingleSubscriber(String message, PeerId peerId){
         FriendNode friendNode = getByPeerId(peerId);
         if(friendNode == null){
-            System.out.println("COULD NOT FIND NODE");
+            if(Node.showOutput) {
+                System.out.println("COULD NOT FIND NODE");
+            }
             return;
         }
 
@@ -51,7 +54,9 @@ public class NodePublisher implements Publisher{
         if(this.subscribers.stream().anyMatch(node -> node.peerId.toBase58().equals(friendNode.peerId.toBase58()))){
             return;
         }
-        System.out.println("NODE " + friendNode.peerId + " HAS CONNECTED");
+        if(Node.showOutput) {
+            System.out.println("NODE " + friendNode.peerId + " HAS CONNECTED");
+        }
         this.subscribers.add(friendNode);
     }
 
@@ -60,7 +65,9 @@ public class NodePublisher implements Publisher{
         if(this.subscribers.stream().noneMatch(node -> node.peerId.toBase58().equals(friendNode.peerId.toBase58()))){
             return;
         }
-        System.out.println("NODE " + friendNode.peerId + " HAS DISCONNECTED");
+        if(Node.showOutput) {
+            System.out.println("NODE " + friendNode.peerId + " HAS DISCONNECTED");
+        }
         this.subscribers.remove(friendNode);
     }
 

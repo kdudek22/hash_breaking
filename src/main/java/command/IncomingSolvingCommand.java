@@ -23,9 +23,7 @@ public class IncomingSolvingCommand implements Command{
 
 
         StringInterval stringInterval = new StringInterval(firstString, secondString);
-//        System.out.println(node.jobs);
         node.jobs.get(id).add(stringInterval);
-//        System.out.println(node.jobs);
         node.alreadyDone.add(stringInterval);
         Collections.sort(node.alreadyDone);
     }

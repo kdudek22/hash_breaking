@@ -23,7 +23,7 @@ public class Node {
     public InetAddress address;
     public String addressString;
     public Discoverer discoverer;
-    public int solveBatchAmount = 10000000;
+    public int solveBatchAmount = 3000000;
     public List<StringInterval> alreadyDone = new ArrayList<>();
     public String hashToFind;
     public Boolean startNextInterval = true;
@@ -36,6 +36,8 @@ public class Node {
     public Map<PeerId, StringInterval> recentReserves = new HashMap<>();
 
     public Map<PeerId, List<StringInterval>> jobs = new HashMap<>();
+
+    public static boolean showOutput = false;
 
     public static Node getInstance(){
         if(instance == null){
@@ -58,8 +60,8 @@ public class Node {
             });
             this.discoverer.start();
 
-            this.hashToFind = StringProvider.getHashFromString("zzzzz");
-            this.startHashBreaker();
+//            this.hashToFind = StringProvider.getHashFromString("zzzzz");
+//            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -68,23 +70,16 @@ public class Node {
 
     public void callbackFromHashBreaker(String foundString){
         if(foundString.equals("BOUNDARY")){
-            System.out.println("??? REACHED THE BOUNDRY ???");
-            StopAndCleanCommand command = new StopAndCleanCommand();
+            ReachedBoundaryCommand command = new ReachedBoundaryCommand();
             command.execute();
         }
         else if(!foundString.equals("")){
-            System.out.println("FOUND SOLUTION " +foundString + " " + StringProvider.getHashFromString(foundString) + " " + this.hashToFind);
             FoundSolutionCommand command = new FoundSolutionCommand(foundString);
             command.execute();
         }
         else{
-            StringInterval searchedInterval = new StringInterval(this.currentStartString,this.currentEndString);
-            System.out.println("*** SEARCHED INTERVAL " + searchedInterval + " ***");
-            if(this.currentStartString!=null){
-                this.alreadyDone.add(searchedInterval);
-                Collections.sort(this.alreadyDone);
-                this.startNextInterval = true;
-            }
+            SearchedIntervalCommand command = new SearchedIntervalCommand();
+            command.execute();
         }
     }
 
@@ -97,7 +92,6 @@ public class Node {
 
                         this.checkIfConflictsAndResolve();
 
-                        System.out.println(this.alreadyDone);
                         if(!this.finished && this.hashToFind!=null){
                             SolveHashIntervalCommand command = new SolveHashIntervalCommand(this.hashToFind);
                             command.execute();
@@ -195,7 +189,8 @@ public class Node {
         if(this.hashToFind != null){
             publisher.sendMessageToSingleSubscriber("SOLVE THIS " + this.hashToFind, info.getPeerId());
             if(this.currentStartString!=null){
-                this.broadcastInterval();
+                publisher.sendMessageToSingleSubscriber(this.alreadyDone.toString(), info.getPeerId());
+//                this.broadcastInterval();
             }
         }
 
@@ -220,20 +215,16 @@ public class Node {
         }
     }
     public void handleDisconnectedNodeLastJob(FriendNode friendNode){
-        if(this.jobs.containsKey(friendNode.peerId)){
-            StringInterval interval = new StringInterval("a","a");
-            for(var x: this.alreadyDone){
-                if(this.jobs.get(friendNode.peerId).get(this.jobs.size()-1).equals(x)){
-                    interval = x;
-                }
-            }
-            this.alreadyDone.remove(interval);
-            System.out.println("THEIR LAST JOB WAS " + this.jobs.get(friendNode.peerId).get(this.jobs.size()-1));
+        if(this.jobs.containsKey(friendNode.peerId)) {
+            DisconectedNodeJobCommand command = new DisconectedNodeJobCommand(friendNode);
+            command.execute();
         }
     }
 
     public String messageReceived(PeerId id, String message){
-        System.out.println("MESSAGE FROM " + id.toBase58() + ": " + message);
+        if(showOutput){
+            System.out.println("MESSAGE FROM " + id.toBase58() + ": " + message);
+        }
 
         if(message.startsWith("SOLVED")){
             StopAndCleanCommand command = new StopAndCleanCommand();

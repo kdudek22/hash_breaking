@@ -1,6 +1,7 @@
 package hashBreaker;
 
 import Nodes.Node;
+import me.tongfei.progressbar.ProgressBar;
 
 import java.security.MessageDigest;
 
@@ -40,14 +41,13 @@ public class HashBreaker {
         System.out.println("=== STARTING HASH BREAKER, SOLVING " + this.startString + " - " + this.endString + " " + this.hashToFind + " ===");
         String currentString = this.startString;
         String currentStrigHash = StringProvider.getHashFromString(currentString);
-        int currentIndex = 0;
-        while(!this.stop && !currentStrigHash.equals(this.hashToFind) && !currentString.equals(this.endString) && currentString.length()<=maxLetterCount){
-            if(currentIndex%2 == 11){
-                System.out.println(currentString + " " + currentStrigHash + " " + this.hashToFind);
+        try (ProgressBar pb = new ProgressBar("Solving", Node.getInstance().solveBatchAmount)) {
+            while (!this.stop && !currentStrigHash.equals(this.hashToFind) && !currentString.equals(this.endString) && currentString.length() <= maxLetterCount) {
+                currentString = StringProvider.generateNextString(currentString);
+                currentStrigHash = StringProvider.getHashFromString(currentString);
+                pb.step();
             }
-            currentString = StringProvider.generateNextString(currentString);
-            currentStrigHash = StringProvider.getHashFromString(currentString);
-            currentIndex+=1;
+            pb.stepTo(Node.getInstance().solveBatchAmount);
         }
         if(currentString.length()>maxLetterCount){
             currentString = "BOUNDARY";
