@@ -20,11 +20,11 @@ public class IncomingSolvingCommand implements Command{
         String firstString = both.split(":")[0];
         String secondString = both.split(":")[1];
 
-
-
         StringInterval stringInterval = new StringInterval(firstString, secondString);
         node.jobs.get(id).add(stringInterval);
-        node.alreadyDone.add(stringInterval);
+        if(!node.alreadyDone.contains(stringInterval)){
+            node.alreadyDone.add(stringInterval);
+        }
         Collections.sort(node.alreadyDone);
     }
 }

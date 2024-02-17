@@ -39,6 +39,7 @@ public class HashBreaker {
 
     public void breakHash(){
         System.out.println("=== STARTING HASH BREAKER, SOLVING " + this.startString + " - " + this.endString + " " + this.hashToFind + " ===");
+        System.out.println(Node.getInstance().alreadyDone);
         String currentString = this.startString;
         String currentStrigHash = StringProvider.getHashFromString(currentString);
         try (ProgressBar pb = new ProgressBar("Solving", Node.getInstance().solveBatchAmount)) {

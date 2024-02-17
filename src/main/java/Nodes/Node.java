@@ -24,7 +24,7 @@ public class Node {
     public String addressString;
     public Discoverer discoverer;
     public int solveBatchAmount = 3000000;
-    public List<StringInterval> alreadyDone = new ArrayList<>();
+    public List<StringInterval> alreadyDone = Collections.synchronizedList(new ArrayList<>());
     public String hashToFind;
     public Boolean startNextInterval = true;
     public Boolean finished = true;
@@ -60,7 +60,7 @@ public class Node {
             });
             this.discoverer.start();
 
-//            this.hashToFind = StringProvider.getHashFromString("zzzzz");
+//            this.hashToFind = StringProvider.getHashFromString("zzzzzz");
 //            this.startHashBreaker();
         }
         catch (Exception e){
@@ -189,8 +189,9 @@ public class Node {
         if(this.hashToFind != null){
             publisher.sendMessageToSingleSubscriber("SOLVE THIS " + this.hashToFind, info.getPeerId());
             if(this.currentStartString!=null){
-                publisher.sendMessageToSingleSubscriber(this.alreadyDone.toString(), info.getPeerId());
-//                this.broadcastInterval();
+                this.broadcastInterval();
+                publisher.sendMessageToSingleSubscriber("DONE:"+this.alreadyDone.toString(), info.getPeerId());
+
             }
         }
 
@@ -224,6 +225,10 @@ public class Node {
     public String messageReceived(PeerId id, String message){
         if(showOutput){
             System.out.println("MESSAGE FROM " + id.toBase58() + ": " + message);
+        }
+        if(message.startsWith("DONE")){
+            AlreadyDoneCommand command = new AlreadyDoneCommand(message);
+            command.execute();
         }
 
         if(message.startsWith("SOLVED")){
@@ -281,7 +286,7 @@ public class Node {
         this.currentEndString = null;
         this.conflict = false;
         this.possibleInterval = null;
-        this.alreadyDone = new ArrayList<>();
+        this.alreadyDone = Collections.synchronizedList(new ArrayList<>());
         System.out.println("CLEANED NODE");
     }
 

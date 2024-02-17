@@ -6,6 +6,10 @@ public class StringInterval implements Comparable{
     public String startString;
     public String endString;
 
+    public StringInterval(String concatedString){
+        this.startString = concatedString.split("-")[0];
+        this.endString = concatedString.split("-")[1];
+    }
     public StringInterval(String startString, String endString){
         this.startString = startString;
         this.endString = endString;

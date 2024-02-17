@@ -14,7 +14,9 @@ public class SearchedIntervalCommand implements Command{
             System.out.println("*** SEARCHED INTERVAL " + searchedInterval + " ***");
         }
         if(node.currentStartString!=null){
-            node.alreadyDone.add(searchedInterval);
+            if(!node.alreadyDone.contains(searchedInterval)){
+                node.alreadyDone.add(searchedInterval);
+            }
             Collections.sort(node.alreadyDone);
             node.startNextInterval = true;
         }
