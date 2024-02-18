@@ -1,6 +1,6 @@
 package command;
 
-import Nodes.Node;
+import node.Node;
 import hashBreaker.StringInterval;
 import io.libp2p.core.PeerId;
 

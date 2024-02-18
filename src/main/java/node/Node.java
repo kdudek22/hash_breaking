@@ -1,4 +1,4 @@
-package Nodes;
+package node;
 import command.*;
 import hashBreaker.StringInterval;
 import hashBreaker.StringProvider;

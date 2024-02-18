@@ -1,6 +1,6 @@
 package command;
 
-import Nodes.Node;
+import node.Node;
 import hashBreaker.HashBreaker;
 
 public class StopHashBreakerCommand implements Command{

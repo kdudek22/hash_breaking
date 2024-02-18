@@ -1,9 +1,7 @@
 package hashBreaker;
 
-import Nodes.Node;
+import node.Node;
 import me.tongfei.progressbar.ProgressBar;
-
-import java.security.MessageDigest;
 
 public class HashBreaker {
     public static HashBreaker instance;

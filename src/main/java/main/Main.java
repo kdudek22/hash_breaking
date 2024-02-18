@@ -1,7 +1,7 @@
-package Nodes;
+package main;
 
+import node.Node;
 import hashBreaker.HashBreaker;
-import hashBreaker.StringProvider;
 
 import java.util.Scanner;
 

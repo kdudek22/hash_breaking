@@ -1,6 +1,6 @@
 package command;
 
-import Nodes.Node;
+import node.Node;
 
 public class SolveCommand implements Command{
     String hashToFind;
