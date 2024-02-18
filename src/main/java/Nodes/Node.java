@@ -11,6 +11,7 @@ import kotlin.Pair;
 import protocol.FriendNodeChatController;
 import subscriberAndPublisher.FriendNode;
 import subscriberAndPublisher.NodePublisher;
+import utils.SleepUtils;
 
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -61,7 +62,7 @@ public class Node {
             });
             this.discoverer.start();
 
-//            this.hashToFind = StringProvider.getHashFromString("zzzzz");
+//            this.hashToFind = StringProvider.getHashFromString("asdgas");
 //            this.startHashBreaker();
         }
         catch (Exception e){
@@ -87,31 +88,26 @@ public class Node {
     public void startHashBreaker(){
         this.finished = false;
         new Thread(()->{
-            while(!this.finished && this.hashToFind!=null){
-                try{
-                    if(this.startNextInterval && !this.finished && this.hashToFind!=null){
+            while(this.shouldRunHashBreaker()){
+                if(this.shouldStartNextInterval()){
 
-                        this.checkIfConflictsAndResolve();
+                    this.checkIfConflictsOccurAndResolve();
 
-                        if(!this.finished && this.hashToFind!=null){
-                            SolveHashIntervalCommand command = new SolveHashIntervalCommand(this.hashToFind);
-                            command.execute();
-                        }
-                    }
-                    else{
-                        Thread.sleep(3000);
+                    if(!this.finished && this.hashToFind!=null){
+                        SolveHashIntervalCommand command = new SolveHashIntervalCommand(this.hashToFind);
+                        command.execute();
                     }
                 }
-                catch (InterruptedException e){
-                    System.out.println("INTERRUPTED");
+                else{
+                    SleepUtils.sleepTimeAmount(3000);
                 }
-
             }
             System.out.println("FINISHED");
         }).start();
     }
 
-    public void checkIfConflictsAndResolve(){
+
+    public void checkIfConflictsOccurAndResolve(){
         boolean firstTime = true;
         while(this.conflict || firstTime){
             this.conflict = false;
@@ -119,12 +115,8 @@ public class Node {
 
             this.checkIfRecentReserverDoNotCollide();
 
-            try{
-            Thread.sleep(1500);
-            }
-            catch (Exception e){
-                System.out.println("INTERRUPTED");
-            }
+            SleepUtils.sleepTimeAmount(1500);
+
             this.checkIfReserveDoesNotCollideWithAlreadyDone();
             firstTime = false;
         }
@@ -202,13 +194,12 @@ public class Node {
             this.jobs.put(info.getPeerId(), new ArrayList<>());
         }
 
-        if(this.hashToFind != null){
+        if(this.hasHashToFind()){
             publisher.sendMessageToSingleSubscriber("SOLVE THIS " + this.hashToFind, info.getPeerId());
-            if(this.currentStartString!=null){
+            if(this.hasIntervalToSolve()){
                 publisher.sendMessageToSingleSubscriber("RESERVE-"+currentStartString+":"+currentEndString,info.getPeerId());
                 this.broadcastInterval();
                 publisher.sendMessageToSingleSubscriber("DONE:"+this.alreadyDone.toString(), info.getPeerId());
-
             }
         }
 
@@ -218,6 +209,20 @@ public class Node {
         });
     }
 
+    public boolean shouldStartNextInterval(){
+        return this.startNextInterval && !this.finished && this.hashToFind!=null;
+    }
+    public boolean shouldRunHashBreaker(){
+        return !this.finished && this.hashToFind!=null;
+    }
+
+    public boolean hasHashToFind(){
+        return this.hashToFind != null;
+    }
+
+    public boolean hasIntervalToSolve(){
+        return this.currentEndString != null;
+    }
     public boolean peerIsAlreadyAdded(PeerInfo info){
         NodePublisher publisher = NodePublisher.getInstance();
         return info.getPeerId().equals(this.host.getPeerId()) || publisher.peerAlreadyInSubscribed(info.getPeerId());
@@ -243,12 +248,13 @@ public class Node {
         if(showOutput){
             System.out.println("MESSAGE FROM " + id.toBase58() + ": " + message);
         }
+
         if(message.startsWith("DONE")){
             AlreadyDoneCommand command = new AlreadyDoneCommand(message);
             command.execute();
         }
 
-        if(message.startsWith("SOLVED")){
+        else if(message.startsWith("SOLVED")){
             SolvedCommand command = new SolvedCommand(message, id);
             command.execute();
         }
@@ -270,6 +276,7 @@ public class Node {
 
         return "";
     }
+
 
     public InetAddress getPrivateIp() {
         try(final DatagramSocket socket = new DatagramSocket()){
