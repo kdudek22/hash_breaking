@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.List;
 
 public class StringProvider {
-    static long min = 'a'-1;
+    static long min = 'a' - 1;
 
-    static long max = 'z'+1;
+    static long max = 'z' + 1;
     static long diff = max - min;
 
     public static String generateNextString(String lastString){

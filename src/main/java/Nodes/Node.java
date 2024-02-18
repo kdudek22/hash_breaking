@@ -62,8 +62,8 @@ public class Node {
             });
             this.discoverer.start();
 
-//            this.hashToFind = StringProvider.getHashFromString("asdgas");
-//            this.startHashBreaker();
+            this.hashToFind = StringProvider.getHashFromString("asdgas");
+            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -113,7 +113,7 @@ public class Node {
             this.conflict = false;
             this.reserveStringInterval();
 
-            this.checkIfRecentReserverDoNotCollide();
+            this.checkIfRecentReservesDoNotCollide();
 
             SleepUtils.sleepTimeAmount(1500);
 
@@ -121,7 +121,7 @@ public class Node {
             firstTime = false;
         }
     }
-    public void checkIfRecentReserverDoNotCollide(){
+    public void checkIfRecentReservesDoNotCollide(){
         for(var x : this.recentReserves.keySet()){
             this.checkIfReserveDoesNotCollide(this.recentReserves.get(x),x);
         }
@@ -173,11 +173,6 @@ public class Node {
     public void broadcastInterval(){
         NodePublisher nodePublisher = NodePublisher.getInstance();
         nodePublisher.sendMessageToSubscribers("SOLVING-"+this.currentStartString+":"+this.currentEndString);
-    }
-
-    public void broadcastPossibleInterval(String startString, String endString){
-        NodePublisher nodePublisher = NodePublisher.getInstance();
-        nodePublisher.sendMessageToSubscribers("RESERVE-"+startString+":"+endString);
     }
 
     public void peerFound(PeerInfo info) {
@@ -253,7 +248,7 @@ public class Node {
         }
 
         if(message.startsWith("DONE")){
-            AlreadyDoneCommand command = new AlreadyDoneCommand(message);
+            IncomingAlreadyDoneCommand command = new IncomingAlreadyDoneCommand(message);
             command.execute();
         }
 
