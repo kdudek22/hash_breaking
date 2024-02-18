@@ -15,6 +15,7 @@ import subscriberAndPublisher.NodePublisher;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Node {
 
@@ -26,16 +27,16 @@ public class Node {
     public int solveBatchAmount = 3000000;
     public List<StringInterval> alreadyDone = Collections.synchronizedList(new ArrayList<>());
     public String hashToFind;
-    public Boolean startNextInterval = true;
-    public Boolean finished = true;
+    public boolean startNextInterval = true;
+    public boolean finished = true;
     public String currentStartString;
     public String currentEndString;
     public boolean conflict;
     public StringInterval possibleInterval;
 
-    public Map<PeerId, StringInterval> recentReserves = new HashMap<>();
+    public Map<PeerId, StringInterval> recentReserves = new ConcurrentHashMap<>();
 
-    public Map<PeerId, List<StringInterval>> jobs = new HashMap<>();
+    public Map<PeerId, List<StringInterval>> jobs = new ConcurrentHashMap<>();
 
     public static boolean showOutput = false;
 
@@ -60,8 +61,8 @@ public class Node {
             });
             this.discoverer.start();
 
-//            this.hashToFind = StringProvider.getHashFromString("zzzzzz");
-//            this.startHashBreaker();
+            this.hashToFind = StringProvider.getHashFromString("zzzzz");
+            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -115,16 +116,22 @@ public class Node {
         while(this.conflict || firstTime){
             this.conflict = false;
             this.reserveStringInterval();
-            for(var x : this.recentReserves.keySet()){
-                this.checkIfReserveDoesNotCollide(this.recentReserves.get(x),x);
-            }
+
+            this.checkIfRecentReserverDoNotCollide();
+
             try{
             Thread.sleep(1500);
             }
             catch (Exception e){
                 System.out.println("INTERRUPTED");
             }
+            this.checkIfReserveDoesNotCollideWithAlreadyDone();
             firstTime = false;
+        }
+    }
+    public void checkIfRecentReserverDoNotCollide(){
+        for(var x : this.recentReserves.keySet()){
+            this.checkIfReserveDoesNotCollide(this.recentReserves.get(x),x);
         }
     }
 
@@ -158,6 +165,15 @@ public class Node {
             }
             else{
                 this.conflict  = true;
+            }
+        }
+    }
+
+    public void checkIfReserveDoesNotCollideWithAlreadyDone(){
+        for(StringInterval doneInterval: this.alreadyDone){
+            if(doneInterval.equals(this.possibleInterval)){
+                this.conflict = true;
+                return;
             }
         }
     }
@@ -232,7 +248,7 @@ public class Node {
         }
 
         if(message.startsWith("SOLVED")){
-            StopAndCleanCommand command = new StopAndCleanCommand();
+            SolvedCommand command = new SolvedCommand(message);
             command.execute();
         }
 
@@ -278,8 +294,8 @@ public class Node {
 
     public void cleanVariables(){
         this.finished = true;
-        this.recentReserves = new HashMap<>();
-        this.jobs = new HashMap<>();
+        this.recentReserves = new ConcurrentHashMap<>();
+        this.jobs = new ConcurrentHashMap<>();
         this.hashToFind = null;
         this.startNextInterval = true;
         this.currentStartString = null;

@@ -42,6 +42,7 @@ public class HashBreaker {
         System.out.println(Node.getInstance().alreadyDone);
         String currentString = this.startString;
         String currentStrigHash = StringProvider.getHashFromString(currentString);
+
         try (ProgressBar pb = new ProgressBar("Solving", Node.getInstance().solveBatchAmount)) {
             while (!this.stop && !currentStrigHash.equals(this.hashToFind) && !currentString.equals(this.endString) && currentString.length() <= maxLetterCount) {
                 currentString = StringProvider.generateNextString(currentString);
@@ -49,6 +50,7 @@ public class HashBreaker {
                 pb.step();
             }
         }
+
         if(currentString.length()>maxLetterCount){
             currentString = "BOUNDARY";
         }

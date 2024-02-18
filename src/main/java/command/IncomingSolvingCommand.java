@@ -22,9 +22,7 @@ public class IncomingSolvingCommand implements Command{
 
         StringInterval stringInterval = new StringInterval(firstString, secondString);
         node.jobs.get(id).add(stringInterval);
-        if(!node.alreadyDone.contains(stringInterval)){
-            node.alreadyDone.add(stringInterval);
-        }
+        node.alreadyDone.add(stringInterval);
         Collections.sort(node.alreadyDone);
     }
 }

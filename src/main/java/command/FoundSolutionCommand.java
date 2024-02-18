@@ -12,9 +12,7 @@ public class FoundSolutionCommand implements Command{
     @Override
     public void execute() {
         Node node = Node.getInstance();
-        if(Node.showOutput) {
-            System.out.println("FOUND SOLUTION " + resString + " " + StringProvider.getHashFromString(resString) + " " + node.hashToFind);
-        }
+        System.out.println("FOUND SOLUTION " + resString + " " + StringProvider.getHashFromString(resString) + " " + node.hashToFind);
         NodePublisher publisher = NodePublisher.getInstance();
         publisher.sendMessageToSubscribers("SOLVED:"+this.resString     );
         StopAndCleanCommand command = new StopAndCleanCommand();
