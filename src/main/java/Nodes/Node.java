@@ -61,8 +61,8 @@ public class Node {
             });
             this.discoverer.start();
 
-            this.hashToFind = StringProvider.getHashFromString("zzzzz");
-            this.startHashBreaker();
+//            this.hashToFind = StringProvider.getHashFromString("zzzzz");
+//            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -205,6 +205,7 @@ public class Node {
         if(this.hashToFind != null){
             publisher.sendMessageToSingleSubscriber("SOLVE THIS " + this.hashToFind, info.getPeerId());
             if(this.currentStartString!=null){
+                publisher.sendMessageToSingleSubscriber("RESERVE-"+currentStartString+":"+currentEndString,info.getPeerId());
                 this.broadcastInterval();
                 publisher.sendMessageToSingleSubscriber("DONE:"+this.alreadyDone.toString(), info.getPeerId());
 
@@ -248,7 +249,7 @@ public class Node {
         }
 
         if(message.startsWith("SOLVED")){
-            SolvedCommand command = new SolvedCommand(message);
+            SolvedCommand command = new SolvedCommand(message, id);
             command.execute();
         }
 
