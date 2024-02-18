@@ -2,15 +2,13 @@ package command;
 
 import Nodes.Node;
 import hashBreaker.StringInterval;
-import kotlin.io.encoding.ExperimentalEncodingApi;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class AlreadyDoneCommand implements Command{
+public class IncomingAlreadyDoneCommand implements Command{
     public String message;
-    public AlreadyDoneCommand(String message){
+    public IncomingAlreadyDoneCommand(String message){
         this.message = message;
     }
     @Override
