@@ -93,7 +93,7 @@ public class Node {
 
                     this.checkIfConflictsOccurAndResolve();
 
-                    if(!this.finished && this.hashToFind!=null){
+                    if(this.shouldSolveInterval()){
                         SolveHashIntervalCommand command = new SolveHashIntervalCommand(this.hashToFind);
                         command.execute();
                     }
@@ -209,6 +209,9 @@ public class Node {
         });
     }
 
+    public boolean shouldSolveInterval(){
+        return !this.finished && this.hashToFind!=null;
+    }
     public boolean shouldStartNextInterval(){
         return this.startNextInterval && !this.finished && this.hashToFind!=null;
     }
