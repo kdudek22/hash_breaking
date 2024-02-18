@@ -48,7 +48,6 @@ public class HashBreaker {
                 currentStrigHash = StringProvider.getHashFromString(currentString);
                 pb.step();
             }
-            pb.stepTo(Node.getInstance().solveBatchAmount);
         }
         if(currentString.length()>maxLetterCount){
             currentString = "BOUNDARY";

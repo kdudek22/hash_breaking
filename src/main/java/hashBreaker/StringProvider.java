@@ -8,8 +8,8 @@ import java.util.List;
 public class StringProvider {
     static long min = 'a'-1;
 
-    static long max = 'z';
-    static long diff = max - min+1;
+    static long max = 'z'+1;
+    static long diff = max - min;
 
     public static String generateNextString(String lastString){
         return convertNumberToString(convertStringToNumber(lastString)+1);
@@ -31,7 +31,6 @@ public class StringProvider {
         List<Character> tmp = new ArrayList<>();
         while(value>0){
             long val = value%diff+min;
-            if(val==96)val+=1;
             char c = (char)(val);
             tmp.add(c);
             value/=diff;

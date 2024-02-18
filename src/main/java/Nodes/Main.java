@@ -17,6 +17,6 @@ public class Main {
         while(true){
             message = s.nextLine();
         }
-
+//        var x =123;
     }
 }
