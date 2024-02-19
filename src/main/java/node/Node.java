@@ -27,7 +27,7 @@ public class Node {
     public Discoverer discoverer;
     public int solveBatchAmount = 3000000;
     public List<StringInterval> alreadyDone = Collections.synchronizedList(new ArrayList<>());
-    public String hashToFind;
+    public static String hashToFind;
     public boolean startNextInterval = true;
     public boolean finished = true;
     public String currentStartString;
@@ -37,9 +37,9 @@ public class Node {
 
     public Map<PeerId, StringInterval> recentReserves = new ConcurrentHashMap<>();
 
-    public Map<PeerId, List<StringInterval>> jobs = new ConcurrentHashMap<>();
+    public Map<PeerId, StringInterval> jobs = new ConcurrentHashMap<>();
 
-    public static boolean showOutput = false;
+    public static boolean showOutput = true;
 
     public static Node getInstance(){
         if(instance == null){
@@ -62,8 +62,9 @@ public class Node {
             });
             this.discoverer.start();
 
-//            this.hashToFind = StringProvider.getHashFromString("zzzzz");
-//            this.startHashBreaker();
+            if(this.hashToFind!=null){
+                this.startHashBreaker();
+            }
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");
@@ -185,9 +186,6 @@ public class Node {
         FriendNode friendNode = new FriendNode(info.getPeerId(), new FriendNodeChatController(info.getPeerId().toBase58(),chatConnection.getSecond()));
         publisher.addSubscriber(friendNode);
 
-        if(!this.jobs.containsKey(info.getPeerId())){
-            this.jobs.put(info.getPeerId(), new ArrayList<>());
-        }
 
         if(this.hasHashToFind()){
             publisher.sendMessageToSingleSubscriber("SOLVE THIS " + this.hashToFind, info.getPeerId());
@@ -240,6 +238,7 @@ public class Node {
             DisconectedNodeJobCommand command = new DisconectedNodeJobCommand(friendNode);
             command.execute();
         }
+
     }
 
     public String messageReceived(PeerId id, String message){
@@ -269,6 +268,11 @@ public class Node {
 
         else if(message.startsWith("SOLVING")){
             IncomingSolvingCommand command = new IncomingSolvingCommand(message, id);
+            command.execute();
+        }
+
+        else if(message.startsWith("CONFLICT")){
+            IncomingConflictCommand command = new IncomingConflictCommand();
             command.execute();
         }
 

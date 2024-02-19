@@ -21,7 +21,8 @@ public class IncomingSolvingCommand implements Command{
         String secondString = both.split(":")[1];
 
         StringInterval stringInterval = new StringInterval(firstString, secondString);
-        node.jobs.get(id).add(stringInterval);
+        node.jobs.put(this.id,stringInterval);
+
         if(!node.alreadyDone.contains(stringInterval)&& !stringInterval.startString.startsWith("null")){
             node.alreadyDone.add(stringInterval);
         }

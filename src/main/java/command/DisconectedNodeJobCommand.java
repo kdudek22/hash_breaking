@@ -15,15 +15,15 @@ public class DisconectedNodeJobCommand implements Command{
         
         StringInterval interval = null;
         for(var alreadyDone: node.alreadyDone){
-            if(node.jobs.get(friendNode.peerId).get(node.jobs.size()-1).equals(alreadyDone)){
+            if(node.jobs.get(friendNode.peerId).equals(alreadyDone)){
                 interval = alreadyDone;
             }
         }
         node.alreadyDone.remove(interval);
         node.recentReserves.remove(friendNode.peerId);
-        if(Node.showOutput) {
-            System.out.println("THEIR LAST JOB WAS " + node.jobs.get(friendNode.peerId).get(node.jobs.size() - 1));
-        }
+//        if(Node.showOutput) {
+            System.out.println("THEIR LAST JOB WAS " + node.jobs.get(friendNode.peerId));
+//        }
 
     }
 
