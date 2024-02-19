@@ -17,7 +17,7 @@ public class BroadcastReserveCommand implements Command{
         node.possibleInterval = possibleInterval;
         node.conflict=false;
         if(Node.showOutput) {
-            System.out.println("RESERVING " + node.possibleInterval);
+            System.out.println("RESERVING " + node.possibleInterval + node.alreadyDone);
         }
 
         nodePublisher.sendMessageToSubscribers("RESERVE-"+node.possibleInterval.startString+":"+node.possibleInterval.endString);

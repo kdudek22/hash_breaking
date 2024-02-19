@@ -62,8 +62,8 @@ public class Node {
             });
             this.discoverer.start();
 
-            this.hashToFind = StringProvider.getHashFromString("asdgas");
-            this.startHashBreaker();
+//            this.hashToFind = StringProvider.getHashFromString("zzzzz");
+//            this.startHashBreaker();
         }
         catch (Exception e){
             System.out.println("FAILED TO CREATE");

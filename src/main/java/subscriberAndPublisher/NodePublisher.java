@@ -50,23 +50,25 @@ public class NodePublisher implements Publisher{
     }
 
     @Override
-    public synchronized void addSubscriber(FriendNode friendNode) {
-        if(this.subscribers.stream().anyMatch(node -> node.peerId.toBase58().equals(friendNode.peerId.toBase58()))){
+    public synchronized void addSubscriber(Subscriber friendNode) {
+        var fNode = (FriendNode) friendNode;
+        if(this.subscribers.stream().anyMatch(node -> node.peerId.toBase58().equals(fNode.peerId.toBase58()))){
             return;
         }
         if(Node.showOutput) {
-            System.out.println("NODE " + friendNode.peerId + " HAS CONNECTED");
+            System.out.println("NODE " + fNode.peerId + " HAS CONNECTED");
         }
-        this.subscribers.add(friendNode);
+        this.subscribers.add(fNode);
     }
 
     @Override
-    public synchronized void removeSubscriber(FriendNode friendNode) {
-        if(this.subscribers.stream().noneMatch(node -> node.peerId.toBase58().equals(friendNode.peerId.toBase58()))){
+    public synchronized void removeSubscriber(Subscriber friendNode) {
+        var fNode = (FriendNode) friendNode;
+        if(this.subscribers.stream().noneMatch(node -> node.peerId.toBase58().equals(fNode.peerId.toBase58()))){
             return;
         }
         if(Node.showOutput) {
-            System.out.println("NODE " + friendNode.peerId + " HAS DISCONNECTED");
+            System.out.println("NODE " + fNode.peerId + " HAS DISCONNECTED");
         }
         this.subscribers.remove(friendNode);
     }
